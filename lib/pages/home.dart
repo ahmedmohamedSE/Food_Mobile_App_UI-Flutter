@@ -1,0 +1,501 @@
+import 'package:animate_do/animate_do.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:line_icons/line_icons.dart';
+import '../constants.dart';
+import '../controllers/food_controller.dart';
+import '../controllers/navigator_controllers.dart';
+import '../controllers/switch_controller.dart';
+import '../controllers/tabBar_controller.dart';
+import '../controllers/wallet_controller.dart';
+import '../pages/details.dart';
+
+class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        drawer: mainDrawer(3),
+        appBar: const MyAppBar(),
+        body: Padding(
+          padding: const EdgeInsets.only(bottom: 7.0, left: 7.0, right: 7.0),
+          child: ListView(
+            children: [
+              const TopTextWidget(),
+              TabBar(),
+              const MiddleSaladsPageView(),
+              const BottomSaladGridView(),
+              const MiddleSaladsPageView(),
+              const BottomSaladGridView(),
+              const BottomSaladGridView(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+class BottomSaladGridView extends StatelessWidget {
+  const BottomSaladGridView({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var _controller = Get.find<SwitchController>();
+    var _foodController = Get.find<FoodController>();
+    return SizedBox(
+      width: w,
+      height: h / 2.598,
+      child: GridView.builder(
+          physics: const BouncingScrollPhysics(),
+          itemCount: _foodController.salads.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.75,
+          ),
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                _controller.currentSaladIndex = index;
+                Get.to(() => const DetailsPage());
+              },
+              child: Container(
+                width: double.infinity,
+                height: double.infinity,
+                margin: const EdgeInsets.all(10),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Positioned(
+                      bottom: 10,
+                      child: FadeInUp(
+                        delay: const Duration(milliseconds: 700),
+                        child: Container(
+                          width: w / 2.4,
+                          height: h / 4,
+                          decoration: BoxDecoration(
+                              color: unSelectedColor,
+                              borderRadius: BorderRadius.circular(30)),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 10,
+                      child: FadeInUp(
+                        delay: const Duration(milliseconds: 800),
+                        child: Spin(
+                          delay: const Duration(milliseconds: 800),
+                          child: SizedBox(
+                            width: w / 3,
+                            height: h / 7,
+                            child: Center(
+                              child: Image.asset(
+                                _foodController.salads[index].img,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 130,
+                      child: FadeInUp(
+                        delay: const Duration(milliseconds: 900),
+                        child: SizedBox(
+                          width: w / 2.7,
+                          height: h / 30,
+                          child: Center(
+                            child: Text(
+                              _foodController.salads[index].title,
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.oxygen(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 19),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 155,
+                      child: FadeInUp(
+                        delay: const Duration(milliseconds: 1000),
+                        child: Text(
+                          _foodController.salads[index].subtitle,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.oxygen(
+                              color: const Color.fromARGB(255, 135, 134, 134),
+                              fontWeight: FontWeight.w300,
+                              fontSize: 14),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      left: 55,
+                      top: 185,
+                      child: FadeInUp(
+                        delay: const Duration(milliseconds: 1100),
+                        child: Text(
+                          "\$${_foodController.salads[index].price.toStringAsFixed(2)}",
+                          style: GoogleFonts.oxygen(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 5,
+                      bottom: 7,
+                      child: FadeInUp(
+                        delay: const Duration(milliseconds: 1150),
+                        child: CircleAvatar(
+                          backgroundColor: Colors.blue,
+                          child: IconButton(
+                              onPressed: () {
+                                Get.find<WalletController>().add(
+                                  id: _foodController.salads[index].id,
+                                  img: _foodController.salads[index].img,
+                                  title: _foodController.salads[index].title,
+                                  subtitle:
+                                      _foodController.salads[index].subtitle,
+                                  price: _foodController.salads[index].price,
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.add,
+                                color: unSelectedColor,
+                              )),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            );
+          }),
+    );
+  }
+}
+
+
+class MiddleSaladsPageView extends StatelessWidget {
+  const MiddleSaladsPageView({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var _controller = Get.find<SwitchController>();
+    var _foodController = Get.find<FoodController>();
+    return SizedBox(
+        width: w,
+        height: h / 4.5,
+        child: PageView.builder(
+            itemCount: _foodController.salads.length,
+            physics: const BouncingScrollPhysics(),
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  _controller.currentSaladIndex = index;
+                  Get.to(() => const DetailsPage());
+                },
+                child: Container(
+                  margin: const EdgeInsets.all(5),
+                  width: w / 1.1,
+                  child: Stack(children: [
+                    Positioned(
+                      bottom: 10,
+                      right: 0,
+                      child: FadeInLeft(
+                        delay: const Duration(milliseconds: 350),
+                        child: Container(
+                          width: w / 1.3,
+                          height: h / 5.5,
+                          decoration: BoxDecoration(
+                              color: unSelectedColor,
+                              borderRadius: BorderRadius.circular(100)),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 3,
+                      left: 5,
+                      child: FadeInLeft(
+                        delay: const Duration(milliseconds: 400),
+                        child: Spin(
+                          delay: const Duration(milliseconds: 400),
+                          child: SizedBox(
+                            width: w / 2.5,
+                            height: h / 5,
+                            child: Hero(
+                              tag: _foodController.salads[index].id,
+                              child: Image.asset(
+                                _foodController.salads[index].img,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      left: 175,
+                      top: 40,
+                      child: FadeInUp(
+                        delay: const Duration(milliseconds: 450),
+                        child: Text(
+                          _foodController.salads[index].title,
+                          style: GoogleFonts.oxygen(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 21),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      left: 175,
+                      top: 68,
+                      child: FadeInUp(
+                        delay: const Duration(milliseconds: 500),
+                        child: Text(
+                          _foodController.salads[index].subtitle,
+                          style: GoogleFonts.oxygen(
+                              color: const Color.fromARGB(255, 135, 134, 134),
+                              fontWeight: FontWeight.w300,
+                              fontSize: 16),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      left: 175,
+                      top: 95,
+                      child: FadeInUp(
+                        delay: const Duration(milliseconds: 600),
+                        child: Text(
+                          "\$${_foodController.salads[index].price.toStringAsFixed(2)}",
+                          style: GoogleFonts.oxygen(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 23),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 5,
+                      bottom: 10,
+                      child: FadeInDown(
+                        delay: const Duration(milliseconds: 650),
+                        child: CircleAvatar(
+                          backgroundColor: Colors.blue,
+                          child: IconButton(
+                              onPressed: () {
+                                Get.find<WalletController>().add(
+                                  id: _foodController.salads[index].id,
+                                  img: _foodController.salads[index].img,
+                                  title: _foodController.salads[index].title,
+                                  subtitle:
+                                      _foodController.salads[index].subtitle,
+                                  price: _foodController.salads[index].price,
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.add,
+                                color: unSelectedColor,
+                              )),
+                        ),
+                      ),
+                    )
+                  ]),
+                ),
+              );
+            }));
+  }
+}
+
+
+class TabBar extends StatelessWidget {
+  TabBar({
+    Key? key,
+  }) : super(key: key);
+
+  final List<String> tabNames = [
+    "Salads",
+    "Soups",
+    "Grilled",
+    "Fish",
+    "Meet",
+    "Fresh Fish",
+    "Water",
+    "Drinks",
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    var _controller = Get.find<TabBarController>();
+    return FadeInUp(
+      delay: const Duration(milliseconds: 300),
+      child: Container(
+        margin: const EdgeInsets.only(top: 10, bottom: 5),
+        width: w,
+        height: h / 15,
+        child: Row(
+          children: [
+            SizedBox(
+              width: w / 1.25,
+              height: double.infinity,
+              child: ListView.builder(
+                  itemCount: 8,
+                  physics: const BouncingScrollPhysics(),
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (ctx, index) {
+                    return Obx(() {
+                      return GestureDetector(
+                        onTap: () {
+                          _controller.currentIndex.value = index;
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          width: w / 4,
+                          height: double.infinity,
+                          margin: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: _controller.currentIndex.value == index
+                                ? Colors.blue
+                                : unSelectedColor,
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                          child: Center(
+                              child: Text(
+                            tabNames[index],
+                            style: GoogleFonts.oxygen(
+                                color: _controller.currentIndex.value == index
+                                    ? const Color.fromARGB(255, 234, 234, 234)
+                                    : Colors.black,
+                                fontSize: 18,fontWeight: FontWeight.w400
+                                ),
+                          )),
+                        ),
+                      );
+                    });
+                  }),
+            ),
+            Expanded(
+              child: RotatedBox(
+                quarterTurns: -15,
+                child: IconButton(
+                  icon: const Icon(
+                    LineIcons.horizontalSliders,
+                    size: 30,color:Colors.blue
+                  ),
+                  onPressed: () {
+                    Get.changeThemeMode(ThemeMode.dark);
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class TopTextWidget extends StatelessWidget {
+  const TopTextWidget({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeInUp(
+      delay: const Duration(milliseconds: 200),
+      child: SizedBox(
+        width: w,
+        height: h / 10,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Delicious Salads",
+                style: GoogleFonts.oxygen(
+                  fontSize: 35,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              Text(
+                " We made fresh and Healthy food",
+                style: GoogleFonts.oxygen(
+                  fontSize: 18,
+                  color: const Color.fromARGB(255, 88, 88, 88),
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MyAppBar extends StatelessWidget with PreferredSizeWidget {
+  const MyAppBar({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Size get preferredSize => const Size.fromHeight(80);
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+        centerTitle: true,
+        title: Text(
+          "Food App UI",
+          style: GoogleFonts.oxygen(color:Colors.blue,
+            // fontSize: 35,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.menu_rounded,
+            color: Colors.blue,
+            size: 35,
+          ),
+          onPressed: () {
+            Scaffold.of(context).openDrawer();
+          },
+        ),
+        actions: [
+          Padding(
+            // padding: const EdgeInsets.fromLTRB(0, 2, 10, 2),
+            padding: const EdgeInsets.only(right: 5.0),
+            child: GestureDetector(
+              onTap: () {
+                Get.find<NavigatorController>().changeNavBarIndex(2);
+              },
+              child: Icon(Icons.account_circle, size: 45, color: Colors.blue),
+              // child:  CircleAvatar(
+              //   radius: 25,
+              //   backgroundImage: AssetImage("assets/images/me2.png"),
+              // ),
+            ),
+          )
+        ],
+      
+    );
+  }
+}
